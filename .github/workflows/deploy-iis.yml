@@ -1,0 +1,35 @@
+
+name: Deploy Hello World to IIS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Windows IIS
+    runs-on: [self-hosted, Windows, X64]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy HTML to IIS
+        shell: powershell
+        run: |
+          $source = "$env:GITHUB_WORKSPACE\index.html"
+          $destination = "C:\inetpub\wwwroot\index.html"
+
+          Copy-Item -Path $source -Destination $destination -Force
+
+          Write-Host "Deployment successful!"
+
+      - name: Verify Deployment
+        shell: powershell
+        run: |
+          Get-Content "C:\inetpub\wwwroot\index.html"
